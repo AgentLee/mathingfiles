@@ -53,7 +53,10 @@ char *divi(char *a, char *b);
 char *expo(char *a, char *b);
 char *fib(char *a, char *b);
 char *factor(char *a, char *b);
+
+/* Global variables */
 char answer[2048];	// set as global so the math functions can work better
+int parseSize; // used for our parsing function to keep track of the number of components 
 
 /* Table of pathInfo's for the different operations */
 const pathInfo pathMath[] = {
@@ -66,7 +69,7 @@ const pathInfo pathMath[] = {
 	{"factor", "Finds factors of a number.\nThe file factor/n contains the prime factors of n.\n", 2, factor},
 };
 
-// FUSE function implementations. 
+/* FUSE function implementations */
 static int mathfs_getattr(const char *path, struct stat *stbuf)
 {
 	int res = 0;
@@ -172,28 +175,37 @@ static int mathfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, o
 	return 0;
 }			
 
+
+/*	goes through path and tokenizes it to get each component
+ *	used for mathfs_open() & mathfs_read() */
+char** parser(char** split, char* pathcpy){
+ 
+  int i = 0;
+  
+  split[i] = strtok(pathcpy, "/");
+  if(split[i] == NULL) {
+    split[i] = "/";
+    i++;
+  }
+  while(split[i] != NULL) {
+    i++;
+    split[i] = strtok(NULL, "/");
+  }
+
+  parseSize = i;
+  return split;
+
+}
+
 static int mathfs_open(const char *path, struct fuse_file_info *fi)
 {
 	char pathcpy[100];
-	char *split[2048];
-	int i = 0;
-	int j = 0;
-
 	memcpy(pathcpy, path, strlen(path) + 1);
 
-	split[i] = strtok(pathcpy, "/");
-	if(split[i] == NULL)
-	{
-		split[i] = "/";
-		i++;
-	}
-
-	while(split[i] != NULL)
-	{
-		i++;
-		split[i] = strtok(NULL, "/");
-	}
-
+	char **split = (char**)malloc(2048);
+	parser(split, pathcpy);
+	
+	int j = 0;
 	while(j < 8)
 	{
 		if(strcmp(split[0], pathMath[j].name) == 0)
@@ -202,7 +214,7 @@ static int mathfs_open(const char *path, struct fuse_file_info *fi)
 			{
 				if((fi->flags & 3) != O_RDONLY)
 					return -EACCES;
-			} else if(i == pathMath[j].arg) {
+			} else if(parseSize == pathMath[j].arg) {
 				if((fi->flags & 3) != O_RDONLY)
 					return -EACCES;
 			}
@@ -214,9 +226,10 @@ static int mathfs_open(const char *path, struct fuse_file_info *fi)
 
 	if(pathMath[j].name == 0)
 		return -ENOENT;
-
+	free(split);
 	return 0;
 }
+
 
 static int mathfs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
@@ -224,25 +237,12 @@ static int mathfs_read(const char *path, char *buf, size_t size, off_t offset, s
 	size_t length;
 	
 	char pathcpy[100];
-	char *split[2048];
-	int i = 0;
-	int j = 0;
-	
 	memcpy(pathcpy, path, strlen(path) + 1);
 
-	split[i] = strtok(pathcpy, "/");
-	if(split[i] == NULL)
-	{
-		split[i] = "/";
-		i++;
-	}
-
- 	while(split[i] != NULL)
-	{
-		i++;
-		split[i] = strtok(NULL, "/");
-	}
-
+	char **split=(char**)malloc(2048);
+	split = parser(split, pathcpy);
+	int j = 0;
+	
 	while(j < 8)
 	{
 		if(strcmp(split[0], pathMath[j].name) == 0)
@@ -261,15 +261,15 @@ static int mathfs_read(const char *path, char *buf, size_t size, off_t offset, s
 					size = 0;
 
 				return size;
-			} else if(i == pathMath[j].arg) {
-				length = strlen(pathMath[j].f(split[i-2], split[i-1]));
+			} else if(parseSize == pathMath[j].arg) {
+				length = strlen(pathMath[j].f(split[parseSize-2], split[parseSize-1]));
 
 				if(offset < length)
 				{
 					if(offset + size > length)
 						size = length - offset;
 			
-					memcpy(buf, pathMath[j].f(split[i-2], split[i-1]) + offset, size);
+					memcpy(buf, pathMath[j].f(split[parseSize-2], split[parseSize-1]) + offset, size);
 				} else 
 					size = 0;
 
@@ -284,25 +284,13 @@ static int mathfs_read(const char *path, char *buf, size_t size, off_t offset, s
 
 	if(pathMath[j].name == 0)
 		return -ENOENT;
-
+	free(split);
 	return 0;
 }	
 
-static struct fuse_operations mathfs_oper = {
-    .getattr = mathfs_getattr,
-    .readdir = mathfs_readdir,
-    .open = mathfs_open,
-    .read = mathfs_read,
-};
 
-int main(int argc, char **argv)
-{
-	timestamp = time(NULL);
 
-    return fuse_main(argc, argv, &mathfs_oper, NULL);
-}
-
-/***** MATH FUNCTIONS *****/
+/* Math Operations */
 int isDecimal(char *n)
 {
 	int i;
@@ -465,20 +453,20 @@ char *fib(char *a, char *b)
 	memset(answer, 0, 2048);
 
 	char fibonacci[1024];
-	int i = 2;
-	long long int j = 1;
+	
+	long long int j = 0l;
 	long long int k = 1;
 	long long int fib;
 	double limit = atof(b);
 
-	strcpy(answer, "1\n1\n");
+	strcpy(answer, CYAN "0\n" RESET);
 
 	if(fabs(limit-floor(limit)) > 0.001)
 	{
 		return RED "VALUE MUST BE INT\n" RESET;
 	}
-
-	while(i < limit)
+	int i;
+	for(i=2; i <= limit; i++)
 	{
 		fib = j + k;
 
@@ -487,8 +475,21 @@ char *fib(char *a, char *b)
 
 		k = j;
 		j = fib;
-		i++;
 	}
 
 	return answer;	
+}
+
+static struct fuse_operations mathfs_oper = {
+    .getattr = mathfs_getattr,
+    .readdir = mathfs_readdir,
+    .open = mathfs_open,
+    .read = mathfs_read,
+};
+
+int main(int argc, char **argv)
+{
+	timestamp = time(NULL);
+
+    return fuse_main(argc, argv, &mathfs_oper, NULL);
 }

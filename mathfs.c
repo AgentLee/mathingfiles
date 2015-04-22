@@ -27,7 +27,9 @@
 #define BLUE	"\x1b[34m"
 #define MAGENTA "\x1b[35m"
 #define CYAN	"\x1b[36m"
-#define REST 	"\x1b[0m"
+#define RESET 	"\x1b[0m"
+
+//static char[5][] colors = {"\x1b[32m", "\x1b[33m", "\x1b[34m", "\x1b[35m", "\x1b[36m"};
 
 /*
  * Set a timestamp so the system can display the correct time and such 
@@ -166,25 +168,7 @@ static int mathfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, o
 	} else {
 		return -ENOENT;
 	}
-/*
-	} else if(strcmp(path, "/add") == 0) {
-		filler(buf, "doc", NULL, 0);
-	} else if(strcmp(path, "/sub") == 0) {
-		filler(buf, "doc", NULL, 0);
-	} else if(strcmp(path, "/mul") == 0) {
-		filler(buf, "doc", NULL, 0);
-	} else if(strcmp(path, "/div") == 0) {
-		filler(buf, "doc", NULL, 0);
-	} else if(strcmp(path, "/fib") == 0) {
-		filler(buf, "doc", NULL, 0);
-	} else if(strcmp(path, "/exp") == 0) {
-		filler(buf, "doc", NULL, 0);
-	} else if(strcmp(path, "/factor") == 0) {
-		filler(buf, "doc", NULL, 0);
-	} else {
-		return -ENOENT;
-	}
-*/
+
 	return 0;
 }			
 
@@ -339,7 +323,7 @@ char *add(char *a, char *b)
 	
 	double x = atof(a);
 	double y = atof(b);
-	sprintf(answer, "%f\n", x+y);
+	sprintf(answer, CYAN "%f\n" RESET, x+y);
 
 	return answer;	
 }
@@ -351,7 +335,7 @@ char *sub(char *a, char *b)
 	double x = atof(a);
 	double y = atof(b);
 
-	sprintf(answer, "%f\n", x-y);
+	sprintf(answer, CYAN "%f\n" RESET, x-y);
 
 	return answer;
 	
@@ -363,7 +347,7 @@ char *mul(char *a, char *b)
 	double x = atof(a);
 	double y = atof(b);
 
-	sprintf(answer, "%f\n", x*y);
+	sprintf(answer, CYAN "%f\n" RESET, x*y);
 
 	return answer;	
 }
@@ -374,13 +358,13 @@ char *divi(char *a, char *b)
 	
 	if(strcmp(b, "0") == 0)
 	{
-		return "DIVIDE BY 0 ERROR\n";
+		return RED "DIVIDE BY 0 ERROR\n" RESET;
 	}
 
 	double x = atof(a);
 	double y = atof(b);
 	
-	sprintf(answer, "%f\n", x/y);
+	sprintf(answer,  CYAN "%f\n" RESET, x/y);
 
 	return answer;
 }
@@ -392,7 +376,7 @@ char *expo(char *a, char *b)
 	double x = atof(a);
 	double y = atof(b);
 
-	sprintf(answer, "%f\n", pow(x, y));
+	sprintf(answer, CYAN "%f\n" RESET, pow(x, y));
 
 	return answer;	
 }
@@ -438,7 +422,7 @@ char *factor(char *a, char *b)
 
 	if(fabs(limit - floor(limit)) > .001)
 	{
-		return "VALUE MUST BE AN INT\n";
+		return RED "VALUE MUST BE AN INT\n" RESET;
 	}	
 
 	x = (long long)limit;
@@ -446,7 +430,7 @@ char *factor(char *a, char *b)
 
 	if(prime(x))
 	{
-		sprintf(factorial, "%lld\n", x);
+		sprintf(factorial, CYAN "%lld\n" RESET, x);
 		strcat(answer, factorial);
 
 		return answer;
@@ -454,7 +438,7 @@ char *factor(char *a, char *b)
 
 	if(x % 2 == 0)
 	{
-		sprintf(factorial, "%i\n", 2);
+		sprintf(factorial, CYAN "%i\n" RESET, 2);
 		strcat(answer, factorial);
 	}
 
@@ -466,7 +450,7 @@ char *factor(char *a, char *b)
 			{
 				iLimit = iLimit/i;
 			
-				sprintf(factorial, "%lld\n", i);
+				sprintf(factorial, CYAN "%lld\n" RESET, i);
 				strcat(answer, factorial);
 			}
 		}
@@ -490,14 +474,14 @@ char *fib(char *a, char *b)
 
 	if(fabs(limit-floor(limit)) > 0.001)
 	{
-		return "VALUE MUST BE INT\n";
+		return RED "VALUE MUST BE INT\n" RESET;
 	}
 
 	while(i < limit)
 	{
 		fib = j + k;
 
-		sprintf(fibonacci, "%lld\n", fib);
+		sprintf(fibonacci,  CYAN "%lld\n" RESET, fib);
 		strcat(answer, fibonacci);
 
 		k = j;

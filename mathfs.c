@@ -454,27 +454,42 @@ char *fib(char *a, char *b)
 
 	char fibonacci[1024];
 	
-	long long int j = 0l;
-	long long int k = 1;
-	long long int fib;
+	long j = 1;
+	long k = 1;
+	long fib;
 	double limit = atof(b);
 
-	strcpy(answer, CYAN "0\n" RESET);
+	if(limit==0){
+		strcpy(answer, CYAN "0\n" RESET);
+		return answer;
+	}
+
+	if(limit ==1 ){
+		strcpy(answer, CYAN "1\n" RESET);
+		return answer;
+	}
+
+	if(limit < 0){
+		return RED "VALUE MUST BE POSITIVE\n" RESET;
+	}
+	strcpy(answer, CYAN "1\n1\n" RESET);
 
 	if(fabs(limit-floor(limit)) > 0.001)
 	{
 		return RED "VALUE MUST BE INT\n" RESET;
 	}
 	int i;
-	for(i=2; i <= limit; i++)
+	for(i=2; i < limit; i++)
 	{
 		fib = j + k;
+		j = k;
+		k = fib;
 
-		sprintf(fibonacci,  CYAN "%lld\n" RESET, fib);
+		sprintf(fibonacci,  CYAN "%lld" RESET, k);
+		if(i < (limit))
+			strcat(fibonacci,"\n");
+
 		strcat(answer, fibonacci);
-
-		k = j;
-		j = fib;
 	}
 
 	return answer;	

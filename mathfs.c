@@ -63,7 +63,6 @@ const pathInfo pathMath[] = {
 	{"exp", "Raises a number to an exponent.\nThe file exp/a/b contains a raised to the power of b.\n", 3, expo},
 	{"fib", "Gets the fibonacci sequence.\nThe file fib/n contains the first n fibonacci numbers.\n", 2, fib},
 	{"factor", "Finds factors of a number.\nThe file factor/n contains the prime factors of n.\n", 2, factor},
-	{NULL, NULL, NULL, NULL}
 };
 
 // FUSE function implementations. 
@@ -100,7 +99,7 @@ static int mathfs_getattr(const char *path, struct stat *stbuf)
 		split[i] = strtok(NULL, "/");
 	}
 
-	while(pathMath[j].name != 0)
+	while(j < 8)
 	{
 		if(strcmp(split[0], pathMath[j].name) == 0)
 		{
@@ -194,7 +193,7 @@ static int mathfs_open(const char *path, struct fuse_file_info *fi)
 		split[i] = strtok(NULL, "/");
 	}
 
-	while(pathMath[j].name != 0)
+	while(j < 8)
 	{
 		if(strcmp(split[0], pathMath[j].name) == 0)
 		{
@@ -243,7 +242,7 @@ static int mathfs_read(const char *path, char *buf, size_t size, off_t offset, s
 		split[i] = strtok(NULL, "/");
 	}
 
-	while(pathMath[j].name != 0)
+	while(j < 8)
 	{
 		if(strcmp(split[0], pathMath[j].name) == 0)
 		{

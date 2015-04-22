@@ -56,14 +56,14 @@ char answer[2048];	// set as global so the math functions can work better
 
 /* Table of pathInfo's for the different operations */
 const pathInfo pathMath[] = {
-	{"add", "The file add/a/b contains the sum a+b.\n", 3, add},
-	{"sub", "The file sub/a/b contains the difference a-b.\n", 3, sub},
-	{"mul", "The file mul/a/b contains the product a*b.\n", 3, mul},
-	{"div", "The file div/a/b contains the quotient a/b.\n", 3, divi},
-	{"exp", "The file exp/a/b contains a raised to the power of b.\n", 3, expo},
-	{"fib", "The file fib/n contains the first n fibonacci numbers.\n", 2, fib},
-	{"factor", "The file factor/n contains the prime factors of n.\n", 2, factor},
-	{0, 0, 0, 0}
+	{"add", "Adds 2 numbers.\nThe file add/a/b contains the sum a+b.\n", 3, add},
+	{"sub", "Subtracts 2 numbers.\nThe file sub/a/b contains the difference a-b.\n", 3, sub},
+	{"mul", "Multiplies 2 numbers.\nThe file mul/a/b contains the product a*b.\n", 3, mul},
+	{"div", "Divides 2 numbers.\nThe file div/a/b contains the quotient a/b.\n", 3, divi},
+	{"exp", "Raises a number to an exponent.\nThe file exp/a/b contains a raised to the power of b.\n", 3, expo},
+	{"fib", "Gets the fibonacci sequence.\nThe file fib/n contains the first n fibonacci numbers.\n", 2, fib},
+	{"factor", "Finds factors of a number.\nThe file factor/n contains the prime factors of n.\n", 2, factor},
+	{NULL, NULL, NULL, NULL}
 };
 
 // FUSE function implementations. 

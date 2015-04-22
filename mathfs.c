@@ -29,14 +29,13 @@
 #define CYAN	"\x1b[36m"
 #define RESET 	"\x1b[0m"
 
-//static char[5][] colors = {"\x1b[32m", "\x1b[33m", "\x1b[34m", "\x1b[35m", "\x1b[36m"};
-
 /*
  * Set a timestamp so the system can display the correct time and such 
  * It printed December 31, 1969 without it so...
  */
 static time_t timestamp = 0;
 
+/* Holds everything about the path together in a nice struct */
 typedef struct pathInfo 
 {
 	char *name;
@@ -57,13 +56,13 @@ char answer[2048];	// set as global so the math functions can work better
 
 /* Table of pathInfo's for the different operations */
 const pathInfo pathMath[] = {
-	{"add", "adding\n", 3, add},
-	{"sub", "subtracting\n", 3, sub},
-	{"mul", "multiplying\n", 3, mul},
-	{"div", "dividing\n", 3, divi},
-	{"exp", "exponentialing\n", 3, expo},
-	{"fib", "fibonacciing\n", 2, fib},
-	{"factor", "factorialing\n", 2, factor},
+	{"add", "The file add/a/b contains the sum a+b.\n", 3, add},
+	{"sub", "The file sub/a/b contains the difference a-b.\n", 3, sub},
+	{"mul", "The file mul/a/b contains the product a*b.\n", 3, mul},
+	{"div", "The file div/a/b contains the quotient a/b.\n", 3, divi},
+	{"exp", "The file exp/a/b contains a raised to the power of b.\n", 3, expo},
+	{"fib", "The file fib/n contains the first n fibonacci numbers.\n", 2, fib},
+	{"factor", "The file factor/n contains the prime factors of n.\n", 2, factor},
 	{0, 0, 0, 0}
 };
 
@@ -117,6 +116,7 @@ static int mathfs_getattr(const char *path, struct stat *stbuf)
 					stbuf->st_mode = S_IFREG | 0664;
 					stbuf->st_nlink = 3;
 					stbuf->st_size = strlen(pathMath[j].doc_desc);
+				
 					return 0;
 				} else if(i == pathMath[j].arg) {
 					stbuf->st_mode = S_IFREG | 0664;
@@ -237,7 +237,7 @@ static int mathfs_read(const char *path, char *buf, size_t size, off_t offset, s
 		i++;
 	}
 
-	while(split[i] != NULL)
+ 	while(split[i] != NULL)
 	{
 		i++;
 		split[i] = strtok(NULL, "/");
@@ -323,7 +323,8 @@ char *add(char *a, char *b)
 	
 	double x = atof(a);
 	double y = atof(b);
-	sprintf(answer, CYAN "%f\n" RESET, x+y);
+
+	sprintf(answer, CYAN "%g\n" RESET, x+y);
 
 	return answer;	
 }
@@ -335,7 +336,7 @@ char *sub(char *a, char *b)
 	double x = atof(a);
 	double y = atof(b);
 
-	sprintf(answer, CYAN "%f\n" RESET, x-y);
+	sprintf(answer, CYAN "%g\n" RESET, x-y);
 
 	return answer;
 	
@@ -347,7 +348,7 @@ char *mul(char *a, char *b)
 	double x = atof(a);
 	double y = atof(b);
 
-	sprintf(answer, CYAN "%f\n" RESET, x*y);
+	sprintf(answer, CYAN "%g\n" RESET, x*y);
 
 	return answer;	
 }
@@ -364,7 +365,7 @@ char *divi(char *a, char *b)
 	double x = atof(a);
 	double y = atof(b);
 	
-	sprintf(answer,  CYAN "%f\n" RESET, x/y);
+	sprintf(answer,  CYAN "%g\n" RESET, x/y);
 
 	return answer;
 }
@@ -376,16 +377,16 @@ char *expo(char *a, char *b)
 	double x = atof(a);
 	double y = atof(b);
 
-	sprintf(answer, CYAN "%f\n" RESET, pow(x, y));
+	sprintf(answer, CYAN "%g\n" RESET, pow(x, y));
 
 	return answer;	
 }
 
-long long prime(long long x)
+long long int prime(long long int x)
 {
 	int i;
 	int count = 0;
-	long long limit = (long long)ceil(sqrt((double)x));
+	long long int limit = (long long int)ceil(sqrt((double)x));
 
 	if(x == 1)
 	{
@@ -413,9 +414,9 @@ char *factor(char *a, char *b)
 	memset(answer, 0, 2048);
 	
 	char factorial[1024];
-	long long i;
-	long long x;
-	long long iLimit;
+	long long int i;
+	long long int x;
+	long long int iLimit;
 	double limit = atof(b);
 	
 	strcpy(answer, "");
@@ -425,7 +426,7 @@ char *factor(char *a, char *b)
 		return RED "VALUE MUST BE AN INT\n" RESET;
 	}	
 
-	x = (long long)limit;
+	x = (long long int)limit;
 	iLimit = x;
 
 	if(prime(x))
@@ -465,9 +466,9 @@ char *fib(char *a, char *b)
 
 	char fibonacci[1024];
 	int i = 2;
-	long long j = 1;
-	long long k = 1;
-	long long fib;
+	long long int j = 1;
+	long long int k = 1;
+	long long int fib;
 	double limit = atof(b);
 
 	strcpy(answer, "1\n1\n");

@@ -20,6 +20,21 @@
 #include <fuse/fuse.h>
 #include <math.h>
 
+/* Let's make it pretty */
+#define RED 	"\x1b[31m"
+#define GREEN	"\x1b[32m"
+#define YELLOW 	"\x1b[33m"
+#define BLUE	"\x1b[34m"
+#define MAGENTA "\x1b[35m"
+#define CYAN	"\x1b[36m"
+#define REST 	"\x1b[0m"
+
+/*
+ * Set a timestamp so the system can display the correct time and such 
+ * It printed December 31, 1969 without it so...
+ */
+static time_t timestamp = 0;
+
 typedef struct pathInfo 
 {
 	char *name;
@@ -28,14 +43,7 @@ typedef struct pathInfo
 	char *(*f)();
 } pathInfo;
 
-const char *add_desc = "Adds 2 numbers together.\n";
-const char *sub_desc = "Subtracts 2 numbers together.\n";
-const char *mul_desc = "Multiplies 2 numbers together.\n";
-const char *div_desc = "Divides 2 numbers together.\n";
-const char *exp_desc = "Takes the exponent.\n";
-const char *fib_desc = "Finds the Fibonacci sequence.\n";
-const char *fact_desc = "Finds prime factors.\n";
-
+/* Math Functions used later */
 char *add(char *a, char *b);
 char *sub(char *a, char *b);
 char *mul(char *a, char *b);
@@ -43,10 +51,9 @@ char *divi(char *a, char *b);
 char *expo(char *a, char *b);
 char *fib(char *a, char *b);
 char *factor(char *a, char *b);
+char answer[2048];	// set as global so the math functions can work better
 
-char answer[2048];
-static time_t timestamp = 0;
-
+/* Table of pathInfo's for the different operations */
 const pathInfo pathMath[] = {
 	{"add", "adding\n", 3, add},
 	{"sub", "subtracting\n", 3, sub},
@@ -153,6 +160,13 @@ static int mathfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, o
 		filler(buf, "exp", NULL, 0);
 		filler(buf, "fib", NULL, 0);
 		filler(buf, "factor", NULL, 0);
+	} else if(strcmp(path, "/add") == 0 || strcmp(path, "/sub") == 0 || strcmp(path, "/mul") == 0 || strcmp(path, "/div") == 0 || strcmp(path, "/fib") == 0 || strcmp(path, "/exp") == 0 || strcmp(path, "/factor") == 0)
+	{
+		filler(buf, "doc", NULL, 0);
+	} else {
+		return -ENOENT;
+	}
+/*
 	} else if(strcmp(path, "/add") == 0) {
 		filler(buf, "doc", NULL, 0);
 	} else if(strcmp(path, "/sub") == 0) {
@@ -170,7 +184,7 @@ static int mathfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, o
 	} else {
 		return -ENOENT;
 	}
-
+*/
 	return 0;
 }			
 
